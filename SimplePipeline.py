@@ -13,8 +13,8 @@ class Runner:
         self.model = None
         self.model_name = None
     
-    def setup_model(self, model_name):
-        self.model = pipeline("summarization", model=model_name)
+    def setup_model(self, model):
+        self.model = pipeline("summarization", model=model)
     
     def run_model(self, documents):
         summary = self.model(documents)
