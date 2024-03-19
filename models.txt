@@ -1,0 +1,6 @@
+google/pegasus-large
+facebook/bart-base
+google-t5/t5-base
+Falconsai/text_summarization
+philschmid/bart-large-cnn-samsum
+google/pegasus-multi_news
