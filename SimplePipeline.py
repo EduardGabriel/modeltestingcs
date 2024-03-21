@@ -1,50 +1,48 @@
 from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
-
-### TODO: 
-### GENERALLY HANDLE tokenization, passing through model, post processing
-### Methods for loading datasets
-### Methods for finetuning 
-### Evaluation of models
+from Summariser import Summariser
+import baseline_summarizer
 
 
-class Runner:
-    def __init__(self):
-        self.model = None
-        self.model_name = None
-    
-    def setup_model(self, model):
-        self.model = pipeline("summarization", model=model)
-    
-    def run_model(self, documents):
-        summary = self.model(documents)
-        return summary
-
+ 
 class TextSummariser:
-    def __init__(self, model_file):
-        self.models = self.load_models(model_file)
+    def __init__(self, model_list):
+        self.model_list = model_list
 
-    def load_models(self, model_file):
-        with open(model_file, 'r') as file:
-            return [line.strip() for line in file]
+    
 
-    def run_summarization(self, text):
-        for model in self.models:
-            runner = Runner()
-            runner.setup_model(model)
-            summary = runner.run_model(text)
-            print("Model:", model, "\n", summary)
+    def run_summarization(self, text_data):
+        for i, text in enumerate(text_data):
+            print(f"\n** Text #{i+1} **\n", text)  # Clear separator for each text entry
+            baseline_summary = baseline_summarizer.text_rank_summarize(text, 0.4)
+            print(f"\n** Baseline summary: {(baseline_summary)}")
+            for model_name in self.model_list:
+                summariser = Summariser(model_name)  #Create  a summariser object object, instantiating a pipeline 
+                summary = summariser.summarize(text) #Generate summary
+                
+                print(f"\n** Model: {model_name} **\n")
+                print(f"**Summary: {summary}\n**")
 
 
+
+survey_data = [
+    "What did you like most about your recent experience with our company? The customer service was exceptional. The representative was very helpful and knowledgeable.",
+    "What features of our product do you find most useful? The reporting functionality is very helpful for analyzing data. I appreciate the ease of use and the intuitive interface. The integration with other applications saves me a lot of time.",
+    "Do you have any suggestions for how we can improve our product? It would be great to have a mobile app for on-the-go access. Adding more customization options for reports would be beneficial. Including tutorials or explainer videos for new users would be helpful.",
+]
+
+model_list = ["Falconsai/text_summarization", "philschmid/bart-large-cnn-samsum", "philschmid/distilbart-cnn-12-6-samsum"]
 
 
 def main():
-    test_set = """America has changed dramatically during recent years. Not only has the number of graduates in traditional engineering disciplines such as mechanical, civil, electrical, chemical, and aeronautical engineering declined, but in most of the premier American universities engineering curricula now concentrate on and encourage largely the study of engineering science. As a result, there are declining offerings in engineering subjects dealing with infrastructure, the environment, and related issues, and greater concentration on high technology subjects, largely supporting increasingly complex scientific developments. While the latter is important, it should not be at the expense of more traditional engineering.
-    Rapidly developing economies such as China and India, as well as other industrial countries in Europe and Asia, continue to encourage and advance the teaching of engineering. Both China and India, respectively, graduate six and eight times as many traditional engineers as does the United States. Other industrial countries at minimum maintain their output, while America suffers an increasingly serious decline in the number of engineering graduates and a lack of well-educated engineers.
-    """
-    summarizer = TextSummariser("models.txt")
-    summarizer.run_summarization(test_set)
+   
+  
 
+
+
+    summarizer = TextSummariser(model_list)
+    summarizer.run_summarization(survey_data)
+    
 
 if __name__ == "__main__":
     main()
