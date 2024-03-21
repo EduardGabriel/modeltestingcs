@@ -1,0 +1,9 @@
+huggingface_hub
+transformers
+datasets 
+evaluate
+rouge_score
+torch
+sentencepiece
+protobuf
+summa
